@@ -25,7 +25,7 @@ export function AnimatedSection({
 }: Props) {
   return (
     <Animated.View
-      style={[{ height: animatedHeight }, styles.overflowHidden]}
+      style={[{ height: animatedHeight as any }, styles.overflowHidden]}
       pointerEvents={state === 'expanded' ? 'auto' : 'none'}
     >
       <Animated.View onLayout={onLayout} style={[styles.container, style]}>
