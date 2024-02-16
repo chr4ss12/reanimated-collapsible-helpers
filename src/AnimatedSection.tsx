@@ -1,48 +1,41 @@
-import React from 'react';
-import {
-  LayoutChangeEvent,
-  StyleSheet,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
-import Animated from 'react-native-reanimated';
-import type { State } from './types';
+import React, { memo, ReactNode } from "react";
+import { LayoutChangeEvent, StyleProp, StyleSheet, ViewStyle } from "react-native";
+import Animated from "react-native-reanimated";
+import isEqual from "react-fast-compare";
+
+import type { State } from "./types";
 
 type Props = {
-  children: React.ReactNode;
+  animatedHeight: any;
+  children: ReactNode;
   onLayout: (event: LayoutChangeEvent) => void;
-  animatedHeight: Animated.Node<number>;
   state: State;
   style?: StyleProp<Animated.AnimateStyle<ViewStyle>>;
 };
 
-export function AnimatedSection({
-  children,
-  onLayout,
-  animatedHeight,
-  state,
-  style,
-}: Props) {
+const AnimatedSection = ({ children, onLayout, animatedHeight, state, style }: Props) => {
   return (
     <Animated.View
-      style={[{ height: animatedHeight as any }, styles.overflowHidden]}
-      pointerEvents={state === 'expanded' ? 'auto' : 'none'}
+      pointerEvents={state === "expanded" ? "auto" : "none"}
+      style={[{ height: animatedHeight }, styles.overflowHidden]}
     >
       <Animated.View onLayout={onLayout} style={[styles.container, style]}>
         {children}
       </Animated.View>
     </Animated.View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  overflowHidden: {
-    overflow: 'hidden',
-  },
   container: {
-    position: 'absolute',
-    top: 0,
     left: 0,
+    position: "absolute",
     right: 0,
+    top: 0
   },
+  overflowHidden: {
+    overflow: "hidden"
+  }
 });
+
+export default memo(AnimatedSection, isEqual);
