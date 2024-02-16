@@ -1,8 +1,13 @@
-import type Animated from 'react-native-reanimated';
+import { EasingFunction } from "react-native/Libraries/Animated/Easing";
+import { SharedValue } from "react-native-reanimated";
 
-export type State = 'expanded' | 'collapsed';
+export declare type State = "expanded" | "collapsed";
 
-export type Config = {
+export declare type Config = {
   duration?: number;
-  easing?: Animated.EasingNodeFunction;
+  easing?: EasingFunction;
+  mounted?: SharedValue<boolean>;
+  show?: boolean | null | undefined;
+  state?: string;
+  unmountOnCollapse?: boolean | null | undefined;
 };
