@@ -1,3 +1,5 @@
 export { useCollapsible } from './useCollapsible';
-export { AnimatedSection } from './AnimatedSection';
+
+import AnimatedSectionDefault from './AnimatedSection';
+export { AnimatedSectionDefault as AnimatedSection };
 export type { State } from './types';
