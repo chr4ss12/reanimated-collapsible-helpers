@@ -1,36 +1,44 @@
-import React from 'react';
-import type { LayoutChangeEvent } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { useCallback, useEffect, useState } from "react";
+import type { LayoutChangeEvent } from "react-native";
+import { Easing, runOnJS, useSharedValue, withTiming } from "react-native-reanimated";
+import type { Config, State } from "./types";
 
-import { runTiming } from './reanimatedHelpers';
-import type { State, Config } from './types';
-
-const { Clock, Value } = Animated;
-
-export function useCollapsible(config?: Config) {
-  const [height, setHeight] = React.useState(0);
-  const [state, setState] = React.useState<State>('collapsed');
-
-  const { current: clock } = React.useRef(new Clock());
-  const { current: progress } = React.useRef(new Value<number>(0));
-  const { current: animation } = React.useRef(new Value<number>(0));
-  const { current: animatedHeight } = React.useRef(
-    runTiming(clock, progress, animation, config?.duration, config?.easing)
+export function useCollapsible(config: Config) {
+  const [height, setHeight] = useState(0);
+  const [state, setState] = useState<State>(
+    config.state === "collapsed" ? "collapsed" : "expanded"
   );
+  const [mounted, setMounted] = useState(config.state === "expanded");
 
-  React.useEffect(() => {
-    if (state === 'collapsed') {
-      animation.setValue(0);
+  const animatedHeight = useSharedValue(0);
+
+  useEffect(() => {
+    if (state === "collapsed") {
+      animatedHeight.value = withTiming(
+        0,
+        {
+          duration: 150,
+          easing: Easing.out(Easing.ease)
+        },
+        () => runOnJS(setMounted)(false)
+      );
     } else {
-      animation.setValue(height);
+      animatedHeight.value = withTiming(
+        height,
+        {
+          duration: 150,
+          easing: Easing.out(Easing.ease)
+        },
+        () => runOnJS(setMounted)(true)
+      );
     }
-  }, [state, height, animation]);
+  }, [state, height, animatedHeight]);
 
-  const onPress = React.useCallback(() => {
-    setState((prev) => (prev === 'collapsed' ? 'expanded' : 'collapsed'));
+  const onPress = useCallback(() => {
+    setState((prev) => (prev === "collapsed" ? "expanded" : "collapsed"));
   }, []);
 
-  const onLayout = React.useCallback(
+  const onLayout = useCallback(
     (event: LayoutChangeEvent) => {
       const measuredHeight = event.nativeEvent.layout.height;
 
@@ -42,10 +50,12 @@ export function useCollapsible(config?: Config) {
   );
 
   return {
-    onLayout,
-    onPress,
     animatedHeight,
     height,
-    state,
+    mounted,
+    onLayout,
+    onPress,
+    setMounted,
+    state
   };
 }
